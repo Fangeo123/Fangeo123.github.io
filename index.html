@@ -1,0 +1,209 @@
+
+<!DOCTYPE html>
+<html>
+
+<style>
+table,th,td {
+  border : 1px solid black;
+  border-collapse: collapse;
+}
+th,td {
+  padding: 5px;
+}
+</style>
+
+<body>
+    <h1>Εθνικό Αρχαιολογικό Μουσείο </h1>
+<button type="button" onclick="loadXMLDocTable()" value="button1">Show my exhibit collection</button>
+<br><br>
+<button type="button" onclick="loadXMLDocSort()" value="button2">Sort by the artists</button>
+<br><br>
+<button type="button" onclick="loadXMLDocNewest()" value="button3">Get the latest exhibit</button>
+<br><br>
+<button type="button" onclick="loadXMLDocSmallest()" value="button4">Get the exhibit with the smallest number</button>
+<br><br>
+
+<table id="demo"></table>
+
+<h1 id="sorted_text"></h1>
+<p id="sorted_list" style="font-size:120%;"></p>
+<h1 id="sorted_int"></h1>
+<p id="sorted_intlist" style="font-size:120%;"></p>
+
+<script>
+        function loadXMLDocTable() {
+          var xmlhttp = new XMLHttpRequest();
+          xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              tableFunction(this);
+            }
+          };
+          xmlhttp.open("GET", "erga.xml", true);
+          xmlhttp.send();
+        }
+        function loadXMLDocSort() {
+          var xmlhttp = new XMLHttpRequest();
+          xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              loadSortedlist(this);
+            }
+          };
+          xmlhttp.open("GET", "erga.xml", true);
+          xmlhttp.send();
+        }function loadXMLDocNewest() {
+          var xmlhttp = new XMLHttpRequest();
+          xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              loadNewest(this);
+            }
+          };
+          xmlhttp.open("GET", "erga.xml", true);
+          xmlhttp.send();
+        }function loadXMLDocSmallest() {
+          var xmlhttp = new XMLHttpRequest();
+          xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              loadSmallest(this);
+            }
+          };
+          xmlhttp.open("GET", "erga.xml", true);
+          xmlhttp.send();
+        }
+        
+        
+        //==========================================================================================================
+        
+        function tableFunction(xml) {
+          var i;
+          var xmlDoc = xml.responseXML;
+          var table="<tr><th>Title</th><th>Artist</th><th>Material</th><th>Year</th><th>Number</th></tr>";
+          var x = xmlDoc.getElementsByTagName("EXHIBIT");
+          for (i = 0; i <x.length; i++) { 
+                table += "<tr><td>" +
+                        x[i].getElementsByTagName("TITLE")[0].childNodes[0].nodeValue +
+                        "</td><td>" +
+                        x[i].getElementsByTagName("ARTIST")[0].childNodes[0].nodeValue +
+                        "</td><td>" +
+                        x[i].getElementsByTagName("MATERIAL")[0].childNodes[0].nodeValue +
+                        "</td><td>" +
+                        x[i].getElementsByTagName("YEAR")[0].childNodes[0].nodeValue +
+                        "</td><td>" +
+                        x[i].getElementsByTagName("NUMBER")[0].childNodes[0].nodeValue +
+                        "</td><tr>";
+          }
+          document.getElementById("demo").innerHTML = table;
+        }
+        
+        
+        //===============================================================================================================
+        
+        function loadSortedlist(xml) {
+          var i;
+          var xmlDoc = xml.responseXML;
+          var table="<tr><th>Artist</th><th>Title</th><th>Material</th><th>Year</th><th>Number</th></tr>";
+          var x = xmlDoc.getElementsByTagName("EXHIBIT");
+          for (i = 0; i <x.length; i++) { 
+                table += "<tr><td>" +
+                        x[i].getElementsByTagName("ARTIST")[0].childNodes[0].nodeValue + 
+                        "</td><td>" +
+                        x[i].getElementsByTagName("TITLE")[0].childNodes[0].nodeValue + 
+                        "</td><td>" +
+                        x[i].getElementsByTagName("MATERIAL")[0].childNodes[0].nodeValue + 
+                        "</td><td>" +
+                        x[i].getElementsByTagName("YEAR")[0].childNodes[0].nodeValue + 
+                        "</td><td>" +
+                        x[i].getElementsByTagName("NUMBER")[0].childNodes[0].nodeValue + 
+                        "</td></tr>";
+          }
+          document.getElementById("demo").innerHTML = table;
+          
+          //This sorts the table by Artist name
+          var table, rows, switching, i, x, y, shouldSwitch;
+          table = document.getElementById("demo");
+          switching = true;
+          while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+              shouldSwitch = false;
+              x = rows[i].getElementsByTagName("td")[0];
+              y = rows[i + 1].getElementsByTagName("td")[0];
+              if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                shouldSwitch = true;
+                break;
+              }
+            }
+            if (shouldSwitch) {
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              switching = true;
+            }
+          }
+        }
+        
+        //====================================================================================================================
+        
+        
+        function loadNewest(xml) {
+                var bigstring;
+                var minyear;
+                var i;
+                var xmlDoc = xml.responseXML;
+                var x = xmlDoc.getElementsByTagName("EXHIBIT");
+                minyear = parseInt(xmlDoc.getElementsByTagName("YEAR")[0].childNodes[0].nodeValue);
+                
+                for (i = 0; i <x.length; i++) {             
+                        if (minyear > parseInt(xmlDoc.getElementsByTagName("YEAR")[i].childNodes[0].nodeValue)) {
+                               bigstring = x[i].getElementsByTagName("TITLE")[0].childNodes[0].nodeValue 
+                               + ", " + x[i].getElementsByTagName("ARTIST")[0].childNodes[0].nodeValue 
+                               + ", " + x[i].getElementsByTagName("MATERIAL")[0].childNodes[0].nodeValue 
+                               + ", " + x[i].getElementsByTagName("YEAR")[0].childNodes[0].nodeValue 
+                               + ", " + x[i].getElementsByTagName("NUMBER")[0].childNodes[0].nodeValue;
+                               
+                               minyear = parseInt(xmlDoc.getElementsByTagName("YEAR")[i].childNodes[0].nodeValue);
+                               
+                       }
+                       
+                       console.log(minyear);
+                       
+                }                
+                document.getElementById("sorted_text").innerHTML = "The latest exhibit by chronological order: ";
+                document.getElementById("sorted_list").innerHTML = bigstring;
+        }
+          
+        //===================================================================================================================
+        
+        function loadSmallest(xml) {
+                var bigstring;
+                var minum;
+                var i;
+                var xmlDoc = xml.responseXML;
+                var x = xmlDoc.getElementsByTagName("EXHIBIT");
+                minum = parseInt(xmlDoc.getElementsByTagName("NUMBER")[0].childNodes[0].nodeValue);
+                           
+                           
+                for (i = 0; i <x.length; i++) {  
+                        if (minum > parseInt(xmlDoc.getElementsByTagName("NUMBER")[i].childNodes[0].nodeValue)) {
+                                bigstring = x[i].getElementsByTagName("TITLE")[0].childNodes[0].nodeValue 
+                                + ", " + x[i].getElementsByTagName("ARTIST")[0].childNodes[0].nodeValue 
+                                + ", " + x[i].getElementsByTagName("MATERIAL")[0].childNodes[0].nodeValue 
+                                + ", " + x[i].getElementsByTagName("YEAR")[0].childNodes[0].nodeValue 
+                                + ", " + x[i].getElementsByTagName("NUMBER")[0].childNodes[0].nodeValue;
+                                
+                                minum = parseInt(xmlDoc.getElementsByTagName("NUMBER")[i].childNodes[0].nodeValue);
+                             
+                       }
+                       
+                    console.log(minum);   
+                }
+                
+                document.getElementById("sorted_int").innerHTML = "The exhibit that entered the museum first: ";
+                document.getElementById("sorted_intlist").innerHTML = bigstring;
+        }
+
+
+
+
+</script>
+
+</body>
+</html>
